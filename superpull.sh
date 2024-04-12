@@ -60,18 +60,18 @@ done
 echo -e "\n${GREEN}Summary:${NC}"
 echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${NC}"
 for repo in "${changed_repositories[@]}"; do
-    echo "${GREEN}- $repo${NC}"
+    echo -e "${GREEN}- $repo${NC}"
 done
 
 # Print summary for repositories with no changes
 echo -e "\n${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${NC}"
 for repo in "${unchanged_repositories[@]}"; do
-    echo "${RED}- $repo${NC}"
+    echo -e "${RED}- $repo${NC}"
 done
 
 # Print summary for skipped repositories
 echo -e "\n${RED}Skipped ${repositories_skipped} repositories (not Git repositories):${NC}"
 for repo in "${skipped_repositories[@]}"; do
-    echo "${RED}- $repo${NC}"
+    echo -e "${RED}- $repo${NC}"
 done
 
