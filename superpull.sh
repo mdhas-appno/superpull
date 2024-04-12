@@ -5,6 +5,9 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Get the top-level directory
+top_level_dir=$(pwd)
+
 # Find all directories in the current directory
 directories=$(find . -maxdepth 1 -type d)
 
@@ -16,7 +19,7 @@ for dir in $directories; do
     # Check if the directory is not the current directory or parent directory
     if [[ "$dir" != "." && "$dir" != ".." ]]; then
         # Change into the directory
-        cd "$dir" || continue
+        cd "$dir" >/dev/null || continue
 
         # Check if it's a git repository
         if [ -d ".git" ]; then
@@ -39,7 +42,7 @@ for dir in $directories; do
         fi
 
         # Move back to the original directory
-        cd -
+        cd - >/dev/null
     fi
 done
 
