@@ -11,3 +11,6 @@ chmod +x superpull.sh
  ```bash
 alias superpull='/path/to/your/script/superpull.sh'
 ```
+
+> [!tip]
+> if you want to make this faster `ssh-add <your key>`
