@@ -2,8 +2,9 @@
 Simple script to git pull from all your repos in a directory at the same time
 
 # installation
+```bash
 chmod +x superpull.sh
- ~/superpull.sh
+```
 
  ## adding it to your shell
  add this line to your shell
