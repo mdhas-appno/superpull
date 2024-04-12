@@ -11,8 +11,14 @@ top_level_dir=$(pwd)
 # Find all directories in the current directory
 directories=$(find . -maxdepth 1 -type d)
 
-# Initialize a variable to keep track of changes
+# Initialize variables to keep track of changes and skipped repositories
 changes_occurred=0
+repositories_skipped=0
+
+# Arrays to store information for the summary
+changed_repositories=()
+unchanged_repositories=()
+skipped_repositories=()
 
 # Loop through each directory
 for dir in $directories; do
@@ -33,21 +39,39 @@ for dir in $directories; do
             if [[ "$pull_output" != "Already up to date." ]]; then
                 echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${GREEN}Yes${NC}\n"
                 echo "$pull_output"
-                changes_occurred=1
+                changes_occurred=$((changes_occurred + 1))
+                changed_repositories+=("$dir")
             else
                 echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${RED}No${NC}\n"
+                unchanged_repositories+=("$dir")
             fi
         else
             echo -n -e "Checking ${RED}$dir${NC}... ${RED}Not a git repository, skipping...${NC}\n"
+            repositories_skipped=$((repositories_skipped + 1))
+            skipped_repositories+=("$dir")
         fi
 
-        # Move back to the original directory
+        # Move back to the original directory and suppress output
         cd - >/dev/null
     fi
 done
 
-# Print summary if changes occurred
-if [ $changes_occurred -eq 0 ]; then
-    echo -e "${RED}No changes pulled in any repositories.${NC}"
-fi
+# Print summary for changes pulled
+echo -e "\n${GREEN}Summary:${NC}"
+echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${NC}"
+for repo in "${changed_repositories[@]}"; do
+    echo "${GREEN}- $repo${NC}"
+done
+
+# Print summary for repositories with no changes
+echo -e "\n${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${NC}"
+for repo in "${unchanged_repositories[@]}"; do
+    echo "${RED}- $repo${NC}"
+done
+
+# Print summary for skipped repositories
+echo -e "\n${RED}Skipped ${repositories_skipped} repositories (not Git repositories):${NC}"
+for repo in "${skipped_repositories[@]}"; do
+    echo "${RED}- $repo${NC}"
+done
 
