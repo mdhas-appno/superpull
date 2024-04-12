@@ -10,6 +10,9 @@ NC='\033[0m' # No Color
 check_repository() {
     local dir=$1
 
+    # Store the current directory
+    local current_dir=$(pwd)
+
     # Change into the directory
     cd "$dir" >/dev/null || return 1
 
@@ -25,6 +28,8 @@ check_repository() {
         if [ -z "$default_branch" ] && [ -z "$(git ls-remote)" ]; then
             # Treat the repository as a local repository only
             echo -n -e "${YELLOW}$dir${NC}... ${YELLOW}Local repository, no remote branch or default branch${NC}\n"
+            # Restore the original directory
+            cd "$current_dir" >/dev/null
             return 3
         else
             # Pull changes from all branches
@@ -34,19 +39,22 @@ check_repository() {
             if [[ "$pull_output" != "Already up to date." ]]; then
                 echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${GREEN}Yes${NC}\n"
                 echo "$pull_output"
+                # Restore the original directory
+                cd "$current_dir" >/dev/null
                 return 0
             else
                 echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${RED}No${NC}\n"
+                # Restore the original directory
+                cd "$current_dir" >/dev/null
                 return 2
             fi
         fi
     else
         echo -n -e "Checking ${RED}$dir${NC}... ${RED}Not a git repository, skipping...${NC}\n"
+        # Restore the original directory
+        cd "$current_dir" >/dev/null
         return 4
     fi
-
-    # Move back to the original directory and suppress output
-    cd - >/dev/null
 }
 
 # Function to print summary for changes pulled
@@ -57,6 +65,7 @@ print_summary_changes() {
     for repo in "${changed_repositories[@]}"; do
         echo -e "${GREEN}- $repo${NC}"
     done
+    echo -e "\n"
 }
 
 # Function to print summary for repositories with no changes
@@ -67,6 +76,7 @@ print_summary_unchanged() {
     for repo in "${unchanged_repositories[@]}"; do
         echo -e "${RED}- $repo${NC}"
     done
+    echo -e "\n"
 }
 
 # Function to print summary for local repositories
@@ -77,6 +87,7 @@ print_summary_local() {
     for repo in "${local_repositories[@]}"; do
         echo -e "${YELLOW}- $repo${NC}"
     done
+    echo -e "\n"
 }
 
 # Function to print summary for skipped repositories
@@ -87,6 +98,7 @@ print_summary_skipped() {
     for repo in "${skipped_repositories[@]}"; do
         echo -e "${RED}- $repo${NC}"
     done
+    echo -e "\n"
 }
 
 # Main script
@@ -126,4 +138,5 @@ print_summary_changes "${changed_repositories[@]}"
 print_summary_unchanged "${unchanged_repositories[@]}"
 print_summary_local "${local_repositories[@]}"
 print_summary_skipped "${skipped_repositories[@]}"
+``
 
