@@ -15,8 +15,11 @@ for dir in $directories; do
 
         # Check if it's a git repository
         if [ -d ".git" ]; then
-            # Run git pull and capture the output
-            pull_output=$(git pull)
+            # Get the current branch name
+            branch=$(git rev-parse --abbrev-ref HEAD)
+
+            # Pull changes from all branches
+            pull_output=$(git pull --all 2>&1)
 
             # Check if any changes were pulled
             if [[ "$pull_output" != "Already up to date." ]]; then
