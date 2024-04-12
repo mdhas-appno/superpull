@@ -84,7 +84,7 @@ for repo in "${unchanged_repositories[@]}"; do
 done
 
 # Print summary for local repositories
-echo -e "\n${YELLOW}Local repositories (no default branch or remote branch):${NC}"
+echo -e "\n${YELLOW}Local repositories ${#local_repositories[@]} (no default branch or remote branch):${NC}"
 for repo in "${local_repositories[@]}"; do
     echo -e "${YELLOW}- $repo${NC}"
 done
