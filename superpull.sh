@@ -15,9 +15,6 @@ changes_occurred=0
 for dir in $directories; do
     # Check if the directory is not the current directory or parent directory
     if [[ "$dir" != "." && "$dir" != ".." ]]; then
-        # Print the directory being checked
-        echo -e "Checking ${GREEN}$dir${NC}"
-
         # Change into the directory
         cd "$dir" || continue
 
@@ -31,14 +28,14 @@ for dir in $directories; do
 
             # Check if any changes were pulled
             if [[ "$pull_output" != "Already up to date." ]]; then
-                echo -e "${GREEN}Changes pulled in $dir:${NC}"
+                echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${GREEN}Yes${NC}\n"
                 echo "$pull_output"
                 changes_occurred=1
             else
-                echo -e "${RED}No changes found in $dir.${NC}"
+                echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${RED}No${NC}\n"
             fi
         else
-            echo -e "${RED}$dir is not a git repository, skipping...${NC}"
+            echo -n -e "Checking ${RED}$dir${NC}... ${RED}Not a git repository, skipping...${NC}\n"
         fi
 
         # Move back to the original directory
