@@ -43,6 +43,7 @@ for dir in $directories; do
                 # Treat the repository as a local repository only
                 echo -n -e "${YELLOW}$dir${NC}... ${YELLOW}Local repository, no remote branch or default branch${NC}\n"
                 local_repositories=$((local_repositories + 1))
+                local_repositories+=("$dir") # Add local repository to the array
             else
                 # Pull changes from all branches
                 pull_output=$(git pull --all 2>&1)
