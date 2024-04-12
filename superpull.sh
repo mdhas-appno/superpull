@@ -14,9 +14,10 @@ for dir in $directories; do
         if [ -d ".git" ]; then
             echo "Pulling changes in $dir"
             # Get the current branch name
-            branch=$(git rev-parse --abbrev-ref HEAD)
+            #branch=$(git rev-parse --abbrev-ref HEAD)
             # Pull from the current branch
-            git pull origin "$branch"
+            git pull --all
+
         else
             echo "$dir is not a git repository, skipping..."
         fi
