@@ -91,7 +91,7 @@ print_summary_unchanged() {
 print_summary_local() {
     local local_repositories=("$@")
 
-    echo -e "${YELLOW}Local repositories (no default branch or remote branch):${WHITE}"
+    echo -e "${YELLOW}Local repositories (${#local_repositories[@]}):${WHITE}"
     for repo in "${local_repositories[@]}"; do
         echo -e "${YELLOW}- $repo${WHITE}"
     done
