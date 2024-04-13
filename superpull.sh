@@ -172,14 +172,8 @@ for dir in $directories; do
     fi
 done
 
-# Print summary
-if [[ "$verbose" == "true" ]]; then
-    echo -e "\n${WHITE}Summary:\n"
-    print_summary_changes "${changed_repositories[@]}"
-    print_summary_local "${local_repositories[@]}"
-    print_summary_unchanged "${unchanged_repositories[@]}"
-    print_summary_skipped "${skipped_repositories[@]}"
-elif [[ "$summary" == "true" ]]; then
+# Print summary if --summary is passed
+if [[ "$summary" == "true" ]]; then
     echo -e "\n${WHITE}Summary:\n"
     print_summary_changes "${changed_repositories[@]}"
     print_summary_local "${local_repositories[@]}"
