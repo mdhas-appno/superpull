@@ -27,7 +27,9 @@ check_repository() {
         # Check if there's a default branch and a remote branch
         if [ -z "$default_branch" ] && [ -z "$(git ls-remote)" ]; then
             # Treat the repository as a local repository only
-            echo -n -e "${YELLOW}$dir${WHITE}... ${YELLOW}Local repository, no remote branch or default branch${WHITE}\n"
+            if [[ "$verbose" == "true" ]]; then
+                echo -n -e "${YELLOW}$dir${WHITE}... ${YELLOW}Local repository, no remote branch or default branch${WHITE}\n"
+            fi
             # Restore the original directory
             cd "$current_dir" >/dev/null
             return 3
@@ -37,20 +39,26 @@ check_repository() {
 
             # Check if any changes were pulled
             if [[ "$pull_output" != "Already up to date." ]]; then
-                echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${GREEN}Yes${WHITE}\n"
-                echo "$pull_output"
+                if [[ "$verbose" == "true" ]]; then
+                    echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${GREEN}Yes${WHITE}\n"
+                    echo "$pull_output"
+                fi
                 # Restore the original directory
                 cd "$current_dir" >/dev/null
                 return 0
             else
-                echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${RED}No${WHITE}\n"
+                if [[ "$verbose" == "true" ]]; then
+                    echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${RED}No${WHITE}\n"
+                fi
                 # Restore the original directory
                 cd "$current_dir" >/dev/null
                 return 2
             fi
         fi
     else
-        echo -n -e "Checking ${WHITE}$dir${WHITE}... ${WHITE}Not a git repository, skipping...${WHITE}\n"
+        if [[ "$verbose" == "true" ]]; then
+            echo -n -e "Checking ${WHITE}$dir${WHITE}... ${WHITE}Not a git repository, skipping...${WHITE}\n"
+        fi
         # Restore the original directory
         cd "$current_dir" >/dev/null
         return 4
@@ -101,6 +109,25 @@ print_summary_skipped() {
     echo -e "\n"
 }
 
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        --summary)
+            summary="true"
+            shift # past argument
+            ;;
+        --verbose)
+            verbose="true"
+            shift # past argument
+            ;;
+        *)    # unknown option
+            echo "Unknown option: $key"
+            exit 1
+            ;;
+    esac
+done
+
 # Main script
 
 # Get the top-level directory
@@ -133,10 +160,17 @@ for dir in $directories; do
 done
 
 # Print summary
-clear
-echo -e "\n${WHITE}Summary:\n"
-print_summary_changes "${changed_repositories[@]}"
-print_summary_local "${local_repositories[@]}"
-print_summary_unchanged "${unchanged_repositories[@]}"
-print_summary_skipped "${skipped_repositories[@]}"
+if [[ "$verbose" == "true" ]]; then
+    echo -e "\n${WHITE}Summary:\n"
+    print_summary_changes "${changed_repositories[@]}"
+    print_summary_local "${local_repositories[@]}"
+    print_summary_unchanged "${unchanged_repositories[@]}"
+    print_summary_skipped "${skipped_repositories[@]}"
+elif [[ "$summary" == "true" ]]; then
+    echo -e "\n${WHITE}Summary:\n"
+    print_summary_changes "${changed_repositories[@]}"
+    print_summary_local "${local_repositories[@]}"
+    print_summary_unchanged "${unchanged_repositories[@]}"
+    print_summary_skipped "${skipped_repositories[@]}"
+fi
 
