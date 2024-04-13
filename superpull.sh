@@ -2,9 +2,9 @@
 
 # Define colors
 GREEN='\033[0;32m'
-RED='\033[0;31m'
 YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
+RED='\033[0;31m'
+WHITE='\033[0m'
 
 # Function to check a repository
 check_repository() {
@@ -27,7 +27,7 @@ check_repository() {
         # Check if there's a default branch and a remote branch
         if [ -z "$default_branch" ] && [ -z "$(git ls-remote)" ]; then
             # Treat the repository as a local repository only
-            echo -n -e "${YELLOW}$dir${NC}... ${YELLOW}Local repository, no remote branch or default branch${NC}\n"
+            echo -n -e "${YELLOW}$dir${WHITE}... ${YELLOW}Local repository, no remote branch or default branch${WHITE}\n"
             # Restore the original directory
             cd "$current_dir" >/dev/null
             return 3
@@ -37,20 +37,20 @@ check_repository() {
 
             # Check if any changes were pulled
             if [[ "$pull_output" != "Already up to date." ]]; then
-                echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${GREEN}Yes${NC}\n"
+                echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${GREEN}Yes${WHITE}\n"
                 echo "$pull_output"
                 # Restore the original directory
                 cd "$current_dir" >/dev/null
                 return 0
             else
-                echo -n -e "Checking ${GREEN}$dir${NC}... Changes pulled in $dir: ${RED}No${NC}\n"
+                echo -n -e "Checking ${GREEN}$dir${WHITE}... Changes pulled in $dir: ${RED}No${WHITE}\n"
                 # Restore the original directory
                 cd "$current_dir" >/dev/null
                 return 2
             fi
         fi
     else
-        echo -n -e "Checking ${RED}$dir${NC}... ${RED}Not a git repository, skipping...${NC}\n"
+        echo -n -e "Checking ${WHITE}$dir${WHITE}... ${WHITE}Not a git repository, skipping...${WHITE}\n"
         # Restore the original directory
         cd "$current_dir" >/dev/null
         return 4
@@ -61,9 +61,9 @@ check_repository() {
 print_summary_changes() {
     local changed_repositories=("$@")
 
-    echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${NC}"
+    echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${WHITE}"
     for repo in "${changed_repositories[@]}"; do
-        echo -e "${GREEN}- $repo${NC}"
+        echo -e "${GREEN}- $repo${WHITE}"
     done
     echo -e "\n"
 }
@@ -72,9 +72,9 @@ print_summary_changes() {
 print_summary_unchanged() {
     local unchanged_repositories=("$@")
 
-    echo -e "${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${NC}"
+    echo -e "${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${WHITE}"
     for repo in "${unchanged_repositories[@]}"; do
-        echo -e "${RED}- $repo${NC}"
+        echo -e "${RED}- $repo${WHITE}"
     done
     echo -e "\n"
 }
@@ -83,9 +83,9 @@ print_summary_unchanged() {
 print_summary_local() {
     local local_repositories=("$@")
 
-    echo -e "${YELLOW}Local repositories (no default branch or remote branch):${NC}"
+    echo -e "${YELLOW}Local repositories (no default branch or remote branch):${WHITE}"
     for repo in "${local_repositories[@]}"; do
-        echo -e "${YELLOW}- $repo${NC}"
+        echo -e "${YELLOW}- $repo${WHITE}"
     done
     echo -e "\n"
 }
@@ -94,9 +94,9 @@ print_summary_local() {
 print_summary_skipped() {
     local skipped_repositories=("$@")
 
-    echo -e "${RED}Skipped ${#skipped_repositories[@]} repositories (not Git repositories):${NC}"
+    echo -e "${WHITE}Skipped ${#skipped_repositories[@]} repositories (not Git repositories):${WHITE}"
     for repo in "${skipped_repositories[@]}"; do
-        echo -e "${RED}- $repo${NC}"
+        echo -e "${WHITE}- $repo${WHITE}"
     done
     echo -e "\n"
 }
@@ -133,10 +133,10 @@ for dir in $directories; do
 done
 
 # Print summary
-echo -e "\n${GREEN}Summary:${NC}"
+clear
+echo -e "\n${WHITE}Summary:\n"
 print_summary_changes "${changed_repositories[@]}"
-print_summary_unchanged "${unchanged_repositories[@]}"
 print_summary_local "${local_repositories[@]}"
+print_summary_unchanged "${unchanged_repositories[@]}"
 print_summary_skipped "${skipped_repositories[@]}"
-``
 
