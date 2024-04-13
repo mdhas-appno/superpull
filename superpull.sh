@@ -109,6 +109,15 @@ print_summary_skipped() {
     echo -e "\n"
 }
 
+# Function to print help message
+print_help() {
+    echo -e "Usage: $0 [OPTIONS]"
+    echo -e "Options:"
+    echo -e "  --summary   Show summary only"
+    echo -e "  --verbose   Show detailed information"
+    echo -e "  --help      Display this help message"
+}
+
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -120,6 +129,10 @@ while [[ $# -gt 0 ]]; do
         --verbose)
             verbose="true"
             shift # past argument
+            ;;
+        --help)
+            print_help
+            exit 0
             ;;
         *)    # unknown option
             echo "Unknown option: $key"
