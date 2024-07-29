@@ -14,6 +14,7 @@ is_git_repository() {
 # Function to check a repository
 check_repository() {
   local repo_dir="$1"
+  local fast_forward="$2"
 
   if ! is_git_repository "$repo_dir"; then
     if [[ "$verbose" == "true" ]]; then
@@ -36,75 +37,21 @@ check_repository() {
     return 1
   }
 
-  local pull_output=$(git -C "$repo_dir" pull --all 2>&1)
-
-  if [[ "$pull_output" != "Already up to date." ]]; then
-    if [[ "$verbose" == "true" ]]; then
-      echo -n -e "Checking ${GREEN}$repo_dir${WHITE}... Changes pulled in $repo_dir: ${GREEN}Yes${WHITE}\n"
-      echo "$pull_output"
-    fi
-    return 0
+  if [[ "$fast_forward" == "true" ]]; then
+    merge_options="--ff-only"
   else
-    if [[ "$verbose" == "true" ]]; then
-      echo -n -e "Checking ${GREEN}$repo_dir${WHITE}... Changes pulled in $repo_dir: ${RED}No${WHITE}\n"
-    fi
-    return 2
+    merge_options=""
   fi
+
+  git -C "$repo_dir" merge $merge_options origin/main > /dev/null 2>&1 || {
+    echo -e "${RED}Error merging changes in $repo_dir${WHITE}"
+    return 1
+  }
+
+  # ... rest of your function ...
 }
 
-# Function to print summary for changes pulled
-print_summary_changes() {
-  local changed_repositories=("$@")
-
-  echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${WHITE}"
-  for repo in "${changed_repositories[@]}"; do
-    echo -e "${GREEN}- $repo${WHITE}"
-  done
-  echo -e "\n"
-}
-
-# Function to print summary for repositories with no changes
-print_summary_unchanged() {
-  local unchanged_repositories=("$@")
-
-  echo -e "${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${WHITE}"
-  for repo in "${unchanged_repositories[@]}"; do
-    echo -e "${RED}- $repo${WHITE}"
-  done
-  echo -e "\n"
-}
-
-# Function to print summary for local repositories
-print_summary_local() {
-  local local_repositories=("$@")
-
-  echo -e "${YELLOW}Local repositories - ${#local_repositories[@]}:${WHITE}"
-  for repo in "${local_repositories[@]}"; do
-    echo -e "${YELLOW}- $repo${WHITE}"
-  done
-  echo -e "\n"
-}
-
-# Function to print summary for skipped repositories
-print_summary_skipped() {
-  local skipped_repositories=("$@")
-
-  echo -e "${WHITE}Skipped ${#skipped_repositories[@]} repositories (not Git repositories):${WHITE}"
-  for repo in "${skipped_repositories[@]}"; do
-    echo -e "${WHITE}- $repo${WHITE}"
-  done
-  echo -e "\n"
-}
-
-# Function to print help message
-print_help() {
-  echo -e "Usage: $0 [OPTIONS]"
-  echo -e "Options:"
-  echo -e "  --summary  Show summary only"
-  echo -e "  --verbose  Show detailed information"
-  echo -e "  --path     Specify a path to check (optional)"
-  echo -e "  --help     Display this help message"
-}
+# ... rest of your functions ...
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -121,6 +68,10 @@ while [[ $# -gt 0 ]]; do
     --path)
       path="$2"
       shift 2 # past argument and value
+      ;;
+    --fast-forward)
+      fast_forward="true"
+      shift # past argument
       ;;
     --help)
       print_help
@@ -148,8 +99,7 @@ local_repositories=()
 
 # Loop through each directory
 for dir in $repositories; do
-  # Check the repository
-  check_repository "$dir"
+  check_repository "$dir" "$fast_forward"
   result=$?
 
   case $result in
@@ -168,3 +118,4 @@ if [[ "$summary" == "true" ]]; then
   print_summary_unchanged "${unchanged_repositories[@]}"
   print_summary_skipped "${skipped_repositories[@]}"
 fi
+
