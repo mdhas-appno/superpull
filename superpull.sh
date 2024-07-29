@@ -51,7 +51,67 @@ check_repository() {
   # ... rest of your function ...
 }
 
-# ... rest of your functions ...
+# Function to print summary for changes pulled
+print_summary_changes() {
+  local changed_repositories=("$@")
+
+  echo -e "${GREEN}Changes pulled in ${#changed_repositories[@]} repositories:${WHITE}"
+  for repo in "${changed_repositories[@]}"; do
+    echo -e "${GREEN}- $repo${WHITE}"
+  done
+  echo -e "\n"
+}
+
+# Function to print summary for repositories with no changes
+print_summary_unchanged() {
+  local unchanged_repositories=("$@")
+
+  echo -e "${RED}No changes pulled in ${#unchanged_repositories[@]} repositories:${WHITE}"
+  for repo in "${unchanged_repositories[@]}"; do
+    echo -e "${RED}- $repo${WHITE}"
+  done
+  echo -e "\n"
+}
+
+# Function to print summary for local repositories
+print_summary_local() {
+  local local_repositories=("$@")
+
+  echo -e "${YELLOW}Local repositories - ${#local_repositories[@]}:${WHITE}"
+  for repo in "${local_repositories[@]}"; do
+    echo -e "${YELLOW}- $repo${WHITE}"
+  done
+  echo -e "\n"
+}
+
+# Function to print summary for skipped repositories
+print_summary_skipped() {
+  local skipped_repositories=("$@")
+
+  echo -e "${WHITE}Skipped ${#skipped_repositories[@]} repositories (not Git repositories):${WHITE}"
+  for repo in "${skipped_repositories[@]}"; do
+    echo -e "${WHITE}- $repo${WHITE}"
+  done
+  echo -e "\n"
+}
+
+# Function to print help message
+print_help() {
+  echo -e "Usage: $0 [OPTIONS]"
+  echo -e "Options:"
+  echo -e "  --summary  Show summary only"
+  echo -e "  --verbose  Show detailed information"
+  echo -e "  --path     Specify a path to check (optional)"
+  echo -e "  --fast-forward  Enable fast-forward merges (optional)"
+  echo -e "  --help     Display this help message"
+}
+
+# Check if the script is running from within a Git repository
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  top_level_dir=$(git rev-parse --show-toplevel)
+else
+  top_level_dir=$(pwd)
+fi
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
